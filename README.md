@@ -111,6 +111,8 @@ Text and feature preparation involved the following steps:
 
 ## 🤖 Modeling and Evaluation
 
+In fraud detection, **recall** is often prioritized over precision or accuracy. Identifying as many fake postings as possible is essential to protect users from scams or phishing attempts. Therefore, in this project, we focused on **maximizing recall** during model training and evaluation.
+
 To make the project more representative and robust, we built three models: **Logistic Regression**, **Linear SVM**, and **XGBoost**. It is standard practice in data science to evaluate multiple models before making a final selection. The choice of models was deliberate:
 
 - **Logistic Regression** provides a simple, fast, and interpretable baseline. It is especially effective with sparse feature matrices like TF-IDF. We tuned it using **randomized search** and applied `class_weight="balanced"` to address class imbalance and improve recall — an important metric in fraud detection, as it reflects how many fake postings the model successfully captures.
@@ -120,6 +122,47 @@ To make the project more representative and robust, we built three models: **Log
 - **XGBoost** is a tree-based ensemble method known for its flexibility in capturing **non-linear relationships** and **feature interactions**.
 
 Comparing these models allows us to validate performance consistency, explore different algorithmic perspectives, and ultimately select the most suitable model for the task.
+
+### ⚙️ Model Building for Recall
+
+- **Logistic Regression**:
+  - Built with `class_weight="balanced"` to address class imbalance
+  - Tuned using **RandomizedSearchCV** with `scoring="recall"`
+  - Best model selected based on 5-fold cross-validated recall
+  ```python
+  log_reg_m = LogisticRegression(max_iter=1000, solver="liblinear", class_weight="balanced")
+  param_dist = {"C": np.logspace(-3, 2, 10)}
+  random_search = RandomizedSearchCV(log_reg_m, param_distributions=param_dist, n_iter=5,
+                                     cv=5, scoring="recall", verbose=1, n_jobs=-1, random_state=42)
+  random_search.fit(X_train_combined, y_train)
+  best_log_reg_m = random_search.best_estimator_
+  ```
+
+- **SVM (LinearSVC)**:
+  - Trained with `class_weight="balanced"` to give more importance to the minority class
+  ```python
+  svm_m = LinearSVC(random_state=42, max_iter=5000, class_weight="balanced")
+  svm_m.fit(X_train_combined, y_train)
+  ```
+
+- **XGBoost**:
+  - Used `scale_pos_weight` to penalize misclassification of fake postings
+  - Tuned using **RandomizedSearchCV** with `scoring="recall"`
+  ```python
+  xgb_model = XGBClassifier(objective='binary:logistic', eval_metric="logloss", 
+                            random_state=42, scale_pos_weight=scale_pos_weight)
+  param_grid = {
+      "n_estimators": [100, 200],
+      "max_depth": [3, 6],
+      "learning_rate": [0.05, 0.1],
+      "subsample": [0.8, 1.0],
+      "colsample_bytree": [0.8, 1.0]
+  }
+  random_search = RandomizedSearchCV(estimator=xgb_model, param_distributions=param_grid, n_iter=8,
+                                     scoring="recall", cv=3, verbose=1, n_jobs=-1, random_state=42)
+  random_search.fit(X_train_combined, y_train)
+  best_xgb = random_search.best_estimator_
+  ```
 
 ### 🔢 Performance Overview
 
@@ -163,7 +206,15 @@ Confusion matrices display the **actual counts** of correct and incorrect predic
   <img src="plots/conf_matrix_xgb.png" width="250"/>
 </div>
 
-Overall, all three models demonstrate **high accuracy**, but **Logistic Regression** stands out for its **recall**, **simplicity**, and **generalization**, making it the most appropriate model for deployment in a fraud detection context.
+### ✅ Final Model Selection
+
+All three models demonstrate **high accuracy**, but our objective was to maximize **recall** to reduce the number of missed fake job postings.
+
+- **Logistic Regression** stands out for its strong recall, simple design, and consistent generalization performance.
+- **SVM** achieved the highest AP score and very close recall but is slightly less interpretable.
+- **XGBoost** provided perfect precision but failed to recall many fake listings.
+
+**Final Choice**: **Logistic Regression** was selected as the best model due to its balance of recall, interpretability, and generalization — making it ideal for deployment in fraud detection scenarios.
 
 ---
 

@@ -238,7 +238,7 @@ Logistic Regression predicts log-odds, and SHAP values here are also in **log-od
 - Words like `team`, `client`, `web`, `user`, `marketing`, and `word_count`—when present—**push the model toward predicting 'Real'**.
 - When these words are absent or low-frequency (blue), the prediction shifts toward "Fake."
 
-<img src="plots/shap_lr.png" width="300" height="350"/>
+<img src="plots/shap_lr.png" width="300" height="300"/>
 
 ---
 
@@ -253,7 +253,7 @@ The SVM model agrees with Logistic Regression on features like `team`, `look`, a
 - Longer posts (high word count) **push predictions toward 'Fake'**
 - Shorter posts (low word count) **nudge toward 'Real'**
 
-<img src="plots/shap_svm.png" width="300" height="350"/>
+<img src="plots/shap_svm.png" width="300" height="300"/>
 
 ---
 

@@ -74,7 +74,7 @@ The dataset is highly imbalanced with only **4.8%** labeled as fake.
   
 - **Word clouds**: Fake postings use sales-like or vague language (e.g., "hiring," "opportunity") vs. real postings that include more specific job-related terms.
 
-<img src="plots/word_clouds.png" width="600" height="500"/>
+<img src="plots/word_clouds.png" width="600" height="300"/>
 
 - **Top job titles**: The most frequent titles are **English Teacher** and **Customer Service Associate**.
 
@@ -238,7 +238,7 @@ Logistic Regression predicts log-odds, and SHAP values here are also in **log-od
 - Words like `team`, `client`, `web`, `user`, `marketing`, and `word_count`—when present—**push the model toward predicting 'Real'**.
 - When these words are absent or low-frequency (blue), the prediction shifts toward "Fake."
 
-<img src="plots/shap_lr.png" width="300" height="500"/>
+<img src="plots/shap_lr.png" width="300" height="400"/>
 
 ---
 
@@ -253,7 +253,7 @@ The SVM model agrees with Logistic Regression on features like `team`, `look`, a
 - Longer posts (high word count) **push predictions toward 'Fake'**
 - Shorter posts (low word count) **nudge toward 'Real'**
 
-<img src="plots/shap_svm.png" width="300" height="500"/>
+<img src="plots/shap_svm.png" width="300" height="400"/>
 
 ---
 

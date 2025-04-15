@@ -187,9 +187,12 @@ The precision-recall curve shows model behavior across all classification thresh
 - **XGBoost**: Tuned for recall, yet still struggled to identify many fake postings. Its recall is low, and AP drops from **0.72** (validation) to **0.67** (test), indicating weaker generalization. Lowering the threshold might improve recall but isn’t needed since the other models already perform well.
 
 <div align="center">
-  <img src="plots/prec_recall_lr.png" width="250"/>
-  <img src="plots/prec_recall_svm.png" width="250"/>
-  <img src="plots/prec_recall_xgb.png" width="250"/>
+  <img src="plots/prec_recall_lr.png" width="400"/>
+  <img src="plots/prec_recall_svm.png" width="400"/>
+</div>
+
+<div align="center" style="margin-top: 20px;">
+  <img src="plots/prec_recall_xgb.png" width="400"/>
 </div>
 
 ### 📊 Confusion Matrices
@@ -273,6 +276,28 @@ Yet SVM interprets longer posts as more likely fake. This discrepancy may arise 
 - When model performance is close, **explainability and domain knowledge** guide model selection.
 
 This insight confirmed our choice of **Logistic Regression** as the final model — not just for its recall and performance, but because its behavior **aligned more intuitively with EDA** and was easier to justify to stakeholders.
+
+---
+## 🎯 General Conclusion
+
+This project explored the challenge of classifying job postings as real or fake using natural language processing and machine learning techniques. By combining text-based features (TF-IDF, word count) with structured metadata, we developed models that help identify potentially fraudulent listings.
+
+We trained and evaluated three models — **Logistic Regression**, **SVM**, and **XGBoost** — with a strong focus on **recall**, given the importance of detecting fake postings to protect users. After extensive tuning and performance comparison, **Logistic Regression** was selected as the final model due to its strong recall, consistent generalization, and interpretability.
+
+### ✅ Answers to Research Questions
+
+1. **Can we accurately classify job postings as real or fake?**  
+   Yes. All three models achieved high classification performance, with accuracies near or above 96% and solid recall for the fake class — the most challenging target.
+
+2. **What patterns and features differentiate fake from real job posts?**  
+   Real postings tend to be longer and use more specific job-related language. In contrast, fake postings often use vague or overly generic terms like “opportunity” or “hiring.” EDA and SHAP analysis revealed that certain words and the overall length of the post are strong indicators of authenticity.
+
+3. **How do the models make their predictions?**  
+   Using SHAP explainability, we visualized how individual features influenced predictions. The most impactful features included keywords like “team,” “client,” and “user,” as well as `word_count`. The models learned different patterns from the same data — highlighting the importance of aligning model behavior with domain knowledge when making a final selection.
+
+---
+
+This analysis demonstrates how machine learning can support automated fraud detection in job platforms and reinforces the value of combining predictive performance with interpretability to guide ethical and effective decision-making.
 
 ---
 

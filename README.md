@@ -18,6 +18,7 @@ While all three models performed well, Logistic Regression offered the best bala
 
 ## 📘 Table of Contents
 - [Technologies](#technologies)
+- [Research Questions](#research questions)
 - [Dataset](#dataset)
 - [EDA](#eda)
 - [Text Preprocessing](#text-preprocessing)
@@ -35,6 +36,21 @@ While all three models performed well, Logistic Regression offered the best bala
 - spaCy (lemmatization)
 - SHAP (model explainability)
 - TF-IDF vectorization
+
+---
+
+## ❓ Research Questions
+
+This project investigates the following core questions:
+
+1. **Can we accurately classify job postings as real or fake?**  
+   Using natural language and structured features, can machine learning models reliably distinguish fraudulent listings?
+
+2. **What patterns and features differentiate fake from real job posts?**  
+   Does word count matter? Are there specific terms, tones, or structural traits that are more common in fake postings?
+
+3. **How do the models make their predictions?**  
+   By applying SHAP explainability techniques, can we understand which features most influence the model's decision and validate that the logic aligns with human intuition?
 
 ---
 

@@ -1,102 +1,78 @@
 # 💼 Real vs Fake Job Postings Classification
 
-Classifying job postings as real or fraudulent using NLP techniques and machine learning models including **Logistic Regression**, **SVM**, and **XGBoost**.
+This project investigates the classification of job postings into **real vs. fake** categories using Natural Language Processing (NLP) and machine learning. The aim is to support job platforms and users in identifying fraudulent job postings by analyzing both structured and unstructured data.
 
-<img src="plots/pexels-ron-lach-9832718.jpg" width="500" height="300"/>
+---
 
-![Python](https://img.shields.io/badge/Python-TextProcessing-blue?logo=python)
-![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
-![Model](https://img.shields.io/badge/Model-Logistic%20Regression%20%7C%20SVM%20%7C%20XGBoost-yellowgreen)
-![Data](https://img.shields.io/badge/Data-Kaggle-orange)
+## 📦 Project Summary
+
+We trained and evaluated three supervised learning models:
+
+- **Logistic Regression** — a linear and interpretable baseline.
+- **Support Vector Machine (SVM)** — a linear model optimized for margin-based class separation.
+- **XGBoost** — a non-linear, ensemble-based classifier capable of capturing feature interactions.
+
+While all three models performed well, Logistic Regression offered the best balance of predictive accuracy, recall, and interpretability. SVM achieved the highest AP score, and XGBoost delivered perfect precision but at the cost of lower recall.
 
 ---
 
 ## 📘 Table of Contents
-- [Overview](#-overview)
-- [Technologies](#-technologies)
-- [Research Question](#-research-question)
-- [Dataset](#-dataset)
-- [Exploratory Data Analysis](#-exploratory-data-analysis)
-- [Text Preprocessing](#-text-preprocessing)
-- [Modeling](#-modeling)
-- [Results and Evaluation](#-results-and-evaluation)
-- [Explainability](#-explainability)
-- [Conclusion](#-conclusion)
+- [Technologies](#technologies)
+- [Dataset](#dataset)
+- [EDA](#eda)
+- [Text Preprocessing](#text-preprocessing)
+- [Modeling and Evaluation](#modeling-and-evaluation)
+- [Model Explainability](#model-explainability)
+- [Conclusion](#conclusion)
+- [Resources](#resources)
 
 ---
 
-## 🧱 Overview
+## ⚙️ Technologies
 
-This project investigates the classification of job postings into **real vs. fake** categories using machine learning and natural language processing (NLP). The goal is to help platforms and users identify fraudulent job offers by leveraging structured and unstructured data from job listings.
-
----
-
-## 🧪 Technologies
-
-- **Language:** Python  
-- **Libraries:** `pandas`, `numpy`, `scikit-learn`, `xgboost`, `matplotlib`, `seaborn`, `wordcloud`, `spacy`, `shap`  
-- **Vectorization:** TF-IDF (unigrams and bigrams)  
-- **Explainability:** SHAP for XGBoost, Logistic Regression, and LinearSVC
+- Python
+- pandas, numpy, scikit-learn, xgboost, matplotlib, seaborn
+- spaCy (lemmatization)
+- SHAP (model explainability)
+- TF-IDF vectorization
 
 ---
 
-## ❓ Research Question
+## 🗃 Dataset
 
-> Can we reliably identify fake job postings based on the job description and requirements using NLP features and machine learning classifiers?
-
----
-
-## 📊 Dataset
-
-- **Source:** [Kaggle - Fake Job Postings Dataset](https://www.kaggle.com/datasets/shivamb/real-or-fake-fake-jobposting-prediction)
-- **Size:** 17,880 job postings
-- **Label:** `fraudulent` (0 = Real, 1 = Fake)
-- **Key Features Used:** `description`, `requirements`, `telecommuting`, `has_company_logo`, `has_questions`, `employment_type`, `industry`
+- **Source**: [Kaggle - Fake Job Postings](https://www.kaggle.com/datasets/shivamb/real-or-fake-fake-jobposting-prediction)
+- **Size**: 17,880 job postings
+- **Target Variable**: `fraudulent` (0 = Real, 1 = Fake)
+- **Key Features Used**: `description`, `requirements`, `telecommuting`, `has_company_logo`, `has_questions`, `employment_type`, `industry`
 
 ---
 
-## 🔍 Exploratory Data Analysis
+## 📊 EDA
 
-- **Only 4.8%** of job postings are fraudulent — heavy class imbalance.
-- Real postings tend to have **longer descriptions**, while fake postings often repeat generic content.
-- **Word clouds** revealed distinct linguistic patterns between real and fake postings. Fake postings use more generic or salesy terms ("opportunity," "apply," "hiring"), while real ones use more technical or specific job-related vocabulary.
+The dataset is highly imbalanced with only **4.8%** labeled as fake.
 
-**Word Cloud Visual:**
+- **Text length**: Real job postings are generally longer.
+- **Word clouds**: Fake postings use sales-like or vague language (e.g., "hiring," "opportunity") vs. real postings that include more specific job-related terms.
+
 <img src="plots/word_clouds.png" width="500"/>
 
 ---
 
 ## 🧹 Text Preprocessing
 
-- Custom stopword handling and lemmatization via spaCy
-- Word count computed as additional feature
-- TF-IDF (1- and 2-grams) using top 5,000 features
+- HTML unescaping and punctuation removal
+- Custom stopword filtering
+- Lemmatization with spaCy
+- Word count features
+- TF-IDF vectorization (unigrams and bigrams, top 5,000 terms)
 
 ---
 
-## ⚙️ Modeling
+## 🤖 Modeling and Evaluation
 
-We trained and compared three models to ensure robustness and representativeness. This aligns with data science best practices, where multiple models are evaluated before final selection. Each model was chosen for its unique learning mechanism:
+We trained **Logistic Regression**, **LinearSVC**, and **XGBoost** using the same feature set (TF-IDF + word count). All models were evaluated using test set metrics and precision-recall tradeoffs.
 
-- **Logistic Regression**: Interpretable baseline model using linear decision boundaries.
-- **Support Vector Machine (SVM)**: Optimizes class separation by maximizing the margin.
-- **XGBoost**: A powerful tree-based ensemble capable of capturing nonlinearities and feature interactions.
-
----
-
-## 📊 Results and Evaluation
-
-### ✏️ Confusion Matrices
-
-These illustrate classification performance on the test set:
-
-<div align="center">
-  <img src="plots/conf_matrix_lr.png" width="250"/>
-  <img src="plots/conf_matrix_svm.png" width="250"/>
-  <img src="plots/conf_matrix_xgb.png" width="250"/>
-</div>
-
-### 🔄 Performance Metrics
+### 🔢 Performance Overview
 
 | Metric             | Logistic Regression | SVM (LinearSVC) | XGBoost |
 |--------------------|---------------------|------------------|---------|
@@ -104,51 +80,61 @@ These illustrate classification performance on the test set:
 | Fake Precision     | 98%                 | 98%              | 100%    |
 | Fake Recall        | 64%                 | 59%              | 55%     |
 | Fake F1-score      | 0.77                | 0.74             | 0.71    |
-| Avg. Precision (Test) | 0.85             | 0.83             | 0.67    |
+| Avg. Precision (Test) | 0.83             | 0.85             | 0.67    |
 
-### 🔢 Precision-Recall Curves
+### 📉 Precision-Recall Curves
 
-These curves help visualize trade-offs between precision and recall at different thresholds. Logistic Regression consistently showed the best balance.
+We plotted PR curves for both validation and test datasets to assess generalization and overfitting. While SVM had the **highest Average Precision (AP)**, Logistic Regression was selected for its better overall **recall**, **balance**, and **interpretability**.
 
-<div align="center">
-  <img src="plots/prec_recall_lr.png" width="300"/>
-  <img src="plots/prec_recall_svm.png" width="300"/>
-  <img src="plots/prec_recall_xgb.png" width="300"/>
-</div>
+<img src="plots/prec_recall_lr.png" width="250"/>
+<img src="plots/prec_recall_svm.png" width="250"/>
+<img src="plots/prec_recall_xgb.png" width="250"/>
+
+### 📊 Confusion Matrices
+
+Confusion matrices help visualize classification errors:
+- **TP**: correctly identified fake postings
+- **FP**: real postings wrongly flagged as fake
+- **FN**: fake postings missed by the model
+- **TN**: correctly identified real postings
+
+<img src="plots/conf_matrix_lr.png" width="250"/>
+<img src="plots/conf_matrix_svm.png" width="250"/>
+<img src="plots/conf_matrix_xgb.png" width="250"/>
 
 ---
 
-## 🧠 Explainability
+## 🧠 Model Explainability
 
-SHAP analysis was applied to all models to interpret individual feature contributions:
+We used SHAP to understand how individual features influenced each model’s output.
 
-- **SHAP values** represent the impact each feature has on the prediction (positive = more fake, negative = more real).
-- In Logistic Regression and SVM, `word_count`, `team`, `look`, and `user` were highly influential.
-- Visuals below show how individual feature values affect predictions.
+- **SHAP value**: quantifies how much a feature contributes to a prediction.
+- Features like `word_count`, `team`, `look`, and `user` showed high impact.
+- Red points = high feature value; Blue = low.
 
-<div align="center">
-  <img src="plots/shap_lr.png" width="300"/>
-  <img src="plots/shap_svm.png" width="300"/>
-</div>
+### SHAP Summary Plots
 
-### ✍ Interpretation (from report):
-- SHAP values confirmed that longer job descriptions tend to be real.
-- Generic marketing language and brevity were strong indicators of fake postings.
-- Logistic Regression provided the clearest and most interpretable decision boundaries.
+<img src="plots/shap_lr.png" width="300"/>
+<img src="plots/shap_svm.png" width="300"/>
+
+**Interpretation highlights:**
+- Logistic Regression favored longer, more descriptive job posts as real.
+- Fake posts often had shorter content and used generic terms.
+- SHAP plots validated linguistic patterns captured during EDA.
 
 ---
 
 ## ✅ Conclusion
 
-- Logistic Regression emerged as the best-performing model overall in terms of F1-score and balance between precision and recall.
-- SVM was close and offered good generalization, while XGBoost struggled with recall despite having perfect precision.
-- SHAP explainability was key to understanding model decisions and validating linguistic intuition.
-- Word count and specific vocabulary patterns are reliable indicators of job posting authenticity.
-- Multiple models were evaluated to ensure result robustness, confirming that a simpler linear model (Logistic Regression) is both effective and interpretable for this NLP classification task.
+- All models achieved high accuracy, but performance varied for the **minority class (fake)**.
+- **Logistic Regression** offered the best combination of **recall**, **stability**, and **interpretability**.
+- **SVM** slightly outperformed in AP but had lower recall.
+- **XGBoost** overfit and yielded low recall despite perfect precision.
+- SHAP analysis confirmed meaningful and intuitive linguistic patterns.
 
 ---
 
-📄 **Notebook & Report**:  
-- [Full notebook](Real_Fake_Job_Postings_update.ipynb)  
-- [Report (PDF)](Real_Fale_Job_Postings_Report.pdf)
+## 📎 Resources
 
+- [Notebook](Real_Fake_Job_Postings_update.ipynb)
+- [Report (PDF)](Real_Fale_Job_Postings_Report.pdf)

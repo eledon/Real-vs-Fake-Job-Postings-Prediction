@@ -67,8 +67,16 @@ This project investigates the following core questions:
 
 The dataset is highly imbalanced with only **4.8%** labeled as fake.
 
-- **Text length**: Real job postings are generally longer.
+- **Text length**: Real job postings are generally longer and more detailed than fake ones.
+  - **Median word count**: 147 for real vs. 113.5 for fake postings
+  - **Maximum word count**: 2,115 for real vs. 1,183 for fake
+  - **Conclusion**: Fake postings are typically shorter and less descriptive, making word count a useful feature for classification.
+  
 - **Word clouds**: Fake postings use sales-like or vague language (e.g., "hiring," "opportunity") vs. real postings that include more specific job-related terms.
+
+- **Top job titles**: The most frequent titles are **English Teacher** and **Customer Service Associate**.
+
+- **Top locations**: The most common job locations are **London**, **New York**, and **San Francisco**.
 
 <img src="plots/word_clouds.png" width="500"/>
 

@@ -74,57 +74,96 @@ The dataset is highly imbalanced with only **4.8%** labeled as fake.
   
 - **Word clouds**: Fake postings use sales-like or vague language (e.g., "hiring," "opportunity") vs. real postings that include more specific job-related terms.
 
+<img src="plots/word_clouds.png" width="500"/>
+
 - **Top job titles**: The most frequent titles are **English Teacher** and **Customer Service Associate**.
 
 - **Top locations**: The most common job locations are **London**, **New York**, and **San Francisco**.
-
-<img src="plots/word_clouds.png" width="500"/>
 
 ---
 
 ## 🧹 Text Preprocessing
 
-- HTML unescaping and punctuation removal
-- Custom stopword filtering
-- Lemmatization with spaCy
-- Word count features
-- TF-IDF vectorization (unigrams and bigrams, top 5,000 terms)
+Text and feature preparation involved the following steps:
+
+- **Column removal**: Features with more than **15% missing values** were dropped. These included `salary_range`, `department`, `required_education`, `benefits`, `required_experience`, and others. This helped reduce noise and ensure reliability of the remaining features.
+  
+- **Duplicate removal**: Duplicate job postings were dropped to avoid data redundancy and bias.
+
+- **Feature engineering**:
+  - A new feature `word_count` was created based on the length of the job description.
+  - `word_count` was then scaled using **Min-Max normalization** to align it with the TF-IDF feature range.
+
+- **Data splitting**:
+  - Before cleaning and vectorizing the text, the data was split into **training**, **validation**, and **test subsets** using **stratified sampling** to preserve the proportion of real and fake job posts.
+  - This step was crucial to prevent **data leakage** during TF-IDF vectorization.
+
+- **Text cleaning and token processing**:
+  - HTML tags and punctuation were removed
+  - Custom stopword filtering was applied (with key domain words like “full,” “part,” etc. preserved)
+  - Lemmatization was performed using **spaCy**
+
+- **Text vectorization**:
+  - TF-IDF vectorization was applied to the cleaned `description` and `requirements` fields using **unigrams and bigrams**
+  - The top **5,000** TF-IDF features were retained for modeling
 
 ---
 
 ## 🤖 Modeling and Evaluation
 
-We trained **Logistic Regression**, **LinearSVC**, and **XGBoost** using the same feature set (TF-IDF + word count). All models were evaluated using test set metrics and precision-recall tradeoffs.
+To make the project more representative and robust, we built three models: **Logistic Regression**, **Linear SVM**, and **XGBoost**. It is standard practice in data science to evaluate multiple models before making a final selection. The choice of models was deliberate:
+
+- **Logistic Regression** provides a simple, fast, and interpretable baseline. It is especially effective with sparse feature matrices like TF-IDF. We tuned it using **randomized search** and applied `class_weight="balanced"` to address class imbalance and improve recall — an important metric in fraud detection, as it reflects how many fake postings the model successfully captures.
+
+- **SVM (LinearSVC)** focuses on **margin maximization**, which improves class separation and often leads to high generalization performance.
+
+- **XGBoost** is a tree-based ensemble method known for its flexibility in capturing **non-linear relationships** and **feature interactions**.
+
+Comparing these models allows us to validate performance consistency, explore different algorithmic perspectives, and ultimately select the most suitable model for the task.
 
 ### 🔢 Performance Overview
 
-| Metric             | Logistic Regression | SVM (LinearSVC) | XGBoost |
-|--------------------|---------------------|------------------|---------|
-| Accuracy           | 98%                 | 96%              | 96%     |
-| Fake Precision     | 98%                 | 98%              | 100%    |
-| Fake Recall        | 64%                 | 59%              | 55%     |
-| Fake F1-score      | 0.77                | 0.74             | 0.71    |
-| Avg. Precision (Test) | 0.83             | 0.85             | 0.67    |
+| Metric                 | Logistic Regression | SVM (LinearSVC) | XGBoost |
+|------------------------|---------------------|------------------|---------|
+| Accuracy               | 98%                 | 96%              | 96%     |
+| Fake Precision         | 98%                 | 98%              | 100%    |
+| Fake Recall            | 64%                 | 59%              | 55%     |
+| Fake F1-score          | 0.77                | 0.74             | 0.71    |
+| Avg. Precision (Test)  | 0.83                | 0.85             | 0.67    |
 
 ### 📉 Precision-Recall Curves
 
-We plotted PR curves for both validation and test datasets to assess generalization and overfitting. While SVM had the **highest Average Precision (AP)**, Logistic Regression was selected for its better overall **recall**, **balance**, and **interpretability**.
+The precision-recall curve shows model behavior across all classification thresholds. It helps us tune thresholds and assess model **stability** and **generalization**. We plot both **validation** and **test** curves to:
+- Evaluate how well the model generalizes
+- Detect signs of overfitting
 
-<img src="plots/prec_recall_lr.png" width="250"/>
-<img src="plots/prec_recall_svm.png" width="250"/>
-<img src="plots/prec_recall_xgb.png" width="250"/>
+> **Average Precision (AP)** summarizes the entire precision-recall curve. It is especially useful in **imbalanced classification** problems like this one.
+
+- **Logistic Regression**: The AP scores for validation and test are close, suggesting strong generalization. While not the highest, the recall is strong and the model is simple and interpretable.
+- **SVM**: Achieved the highest AP (0.85) and very similar scores on validation and test sets, indicating excellent generalization. It correctly identified **69 fake postings** (TP) and missed 17 (FN), achieving a **recall of 0.80**.
+- **XGBoost**: Tuned for recall, yet still struggled to identify many fake postings. Its recall is low, and AP drops from **0.72** (validation) to **0.67** (test), indicating weaker generalization. Lowering the threshold might improve recall but isn’t needed since the other models already perform well.
+
+<div align="center">
+  <img src="plots/prec_recall_lr.png" width="250"/>
+  <img src="plots/prec_recall_svm.png" width="250"/>
+  <img src="plots/prec_recall_xgb.png" width="250"/>
+</div>
 
 ### 📊 Confusion Matrices
 
-Confusion matrices help visualize classification errors:
-- **TP**: correctly identified fake postings
-- **FP**: real postings wrongly flagged as fake
-- **FN**: fake postings missed by the model
-- **TN**: correctly identified real postings
+Confusion matrices display the **actual counts** of correct and incorrect predictions. They are key to calculating recall and precision.
 
-<img src="plots/conf_matrix_lr.png" width="250"/>
-<img src="plots/conf_matrix_svm.png" width="250"/>
-<img src="plots/conf_matrix_xgb.png" width="250"/>
+- **Logistic Regression**: Correctly identified **72 fake postings** (TP), and missed **14** (FN). Recall = 72 / (72 + 14) = **0.837** — a strong result for fraud detection.
+- **SVM**: Correctly identified **69 fakes**, missed **17**, giving recall = **0.80**.
+- **XGBoost**: High precision but poor recall — many fake jobs go undetected.
+
+<div align="center">
+  <img src="plots/conf_matrix_lr.png" width="250"/>
+  <img src="plots/conf_matrix_svm.png" width="250"/>
+  <img src="plots/conf_matrix_xgb.png" width="250"/>
+</div>
+
+Overall, all three models demonstrate **high accuracy**, but **Logistic Regression** stands out for its **recall**, **simplicity**, and **generalization**, making it the most appropriate model for deployment in a fraud detection context.
 
 ---
 

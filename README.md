@@ -8,9 +8,9 @@ This project investigates the classification of job postings into **real vs. fak
 
 We trained and evaluated three supervised learning models:
 
-- **Logistic Regression** — a linear and interpretable baseline.
-- **Support Vector Machine (SVM)** — a linear model optimized for margin-based class separation.
-- **XGBoost** — a non-linear, ensemble-based classifier capable of capturing feature interactions.
+- **Logistic Regression** - a linear and interpretable baseline.
+- **Support Vector Machine (SVM)** - a linear model optimized for margin-based class separation.
+- **XGBoost** - a non-linear, ensemble-based classifier capable of capturing feature interactions.
 
 While all three models performed well, Logistic Regression offered the best balance of predictive accuracy, recall, and interpretability. SVM achieved the highest AP score, and XGBoost delivered perfect precision but at the cost of lower recall.
 
@@ -199,9 +199,9 @@ The precision-recall curve shows model behavior across all classification thresh
 
 Confusion matrices display the **actual counts** of correct and incorrect predictions. They are key to calculating recall and precision.
 
-- **Logistic Regression**: Correctly identified **72 fake postings** (TP), and missed **14** (FN). Recall = 72 / (72 + 14) = **0.837** — a strong result for fraud detection.
+- **Logistic Regression**: Correctly identified **72 fake postings** (TP), and missed **14** (FN). Recall = 72 / (72 + 14) = **0.837** - a strong result for fraud detection.
 - **SVM**: Correctly identified **69 fakes**, missed **17**, giving recall = **0.80**.
-- **XGBoost**: High precision but poor recall — many fake jobs go undetected.
+- **XGBoost**: High precision but poor recall - many fake jobs go undetected.
 
 <div align="center">
   <img src="plots/conf_matrix_lr.png" width="250"/>
@@ -249,7 +249,7 @@ For the SVM model, SHAP values reflect the contribution to the **distance from t
 - Red = high value (e.g., word present, long word count)
 - Blue = low value (word absent, short description)
 
-The SVM model agrees with Logistic Regression on features like `team`, `look`, and `user`—their presence strongly indicates a real post. However, **`word_count` behaves differently** in the SVM model:
+The SVM model agrees with Logistic Regression on features like `team`, `look`, and `user`-their presence strongly indicates a real post. However, **`word_count` behaves differently** in the SVM model:
 - Longer posts (high word count) **push predictions toward 'Fake'**
 - Shorter posts (low word count) **nudge toward 'Real'**
 
@@ -275,25 +275,25 @@ Yet SVM interprets longer posts as more likely fake. This discrepancy may arise 
 - It also revealed subtle differences in how models interpret those features.
 - When model performance is close, **explainability and domain knowledge** guide model selection.
 
-This insight confirmed our choice of **Logistic Regression** as the final model — not just for its recall and performance, but because its behavior **aligned more intuitively with EDA** and was easier to justify to stakeholders.
+This insight confirmed our choice of **Logistic Regression** as the final model - not just for its recall and performance, but because its behavior **aligned more intuitively with EDA** and was easier to justify to stakeholders.
 
 ---
 ## 🎯 General Conclusion
 
 This project explored the challenge of classifying job postings as real or fake using natural language processing and machine learning techniques. By combining text-based features (TF-IDF, word count) with structured metadata, we developed models that help identify potentially fraudulent listings.
 
-We trained and evaluated three models — **Logistic Regression**, **SVM**, and **XGBoost** — with a strong focus on **recall**, given the importance of detecting fake postings to protect users. After extensive tuning and performance comparison, **Logistic Regression** was selected as the final model due to its strong recall, consistent generalization, and interpretability.
+We trained and evaluated three models - **Logistic Regression**, **SVM**, and **XGBoost** - with a strong focus on **recall**, given the importance of detecting fake postings to protect users. After extensive tuning and performance comparison, **Logistic Regression** was selected as the final model due to its strong recall, consistent generalization, and interpretability.
 
 ### ✅ Answers to Research Questions
 
 1. **Can we accurately classify job postings as real or fake?**  
-   Yes. All three models achieved high classification performance, with accuracies near or above 96% and solid recall for the fake class — the most challenging target.
+   Yes. All three models achieved high classification performance, with accuracies near or above 96% and solid recall for the fake class - the most challenging target.
 
 2. **What patterns and features differentiate fake from real job posts?**  
    Real postings tend to be longer and use more specific job-related language. In contrast, fake postings often use vague or overly generic terms like “opportunity” or “hiring.” EDA and SHAP analysis revealed that certain words and the overall length of the post are strong indicators of authenticity.
 
 3. **How do the models make their predictions?**  
-   Using SHAP explainability, we visualized how individual features influenced predictions. The most impactful features included keywords like “team,” “client,” and “user,” as well as `word_count`. The models learned different patterns from the same data — highlighting the importance of aligning model behavior with domain knowledge when making a final selection.
+   Using SHAP explainability, we visualized how individual features influenced predictions. The most impactful features included keywords like “team,” “client,” and “user,” as well as `word_count`. The models learned different patterns from the same data - highlighting the importance of aligning model behavior with domain knowledge when making a final selection.
 
 ---
 
